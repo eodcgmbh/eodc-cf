@@ -1,0 +1,32 @@
+[project]
+authors = [{ name = "EODC", email = "claudio.schein-navacchi@eodc.eu" }]
+name = "eodc_cf"
+dynamic = ["version"]
+description = "Generic and light-weight package to assist CF-compliant dataset creation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: GIS",
+    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: POSIX",
+    "Natural Language :: English",
+]
+[project.urls]
+Repository = "https://github.com/eodcgmbh/eodc-cf"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+trunk = []
