@@ -3,4 +3,4 @@ from lib import CFLatCoordinate, CFLonCoordinate, CFXCoordinate, CFYCoordinate, 
 from eodc_cf._version import __version__
 from eodc_cf._version import __commit__
 
-__all__ = CFCoordinate + CFDataVariable + CFDataset + CFLatCoordinate + CFLonCoordinate + CFXCoordinate + CFYCoordinate + CFTimeCoordinate
+#__all__ = CFCoordinate + CFDataVariable + CFDataset + CFLatCoordinate + CFLonCoordinate + CFXCoordinate + CFYCoordinate + CFTimeCoordinate
