@@ -5,4 +5,4 @@ from eodc_cf._version import __commit__
 
 name = "eodc_cf"
 
-__all__ = __version__ + __commit__ + CFCoordinate + CFDataVariable + CFDataset + CFLatCoordinate + CFLonCoordinate + CFXCoordinate + CFYCoordinate + CFTimeCoordinate
+#__all__ = __version__ + __commit__ + CFCoordinate + CFDataVariable + CFDataset + CFLatCoordinate + CFLonCoordinate + CFXCoordinate + CFYCoordinate + CFTimeCoordinate
