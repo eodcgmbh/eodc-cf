@@ -1,5 +1,5 @@
 import xarray as xr
-from _core import CFDataset
+from eodc_cf._core import CFDataset
 
 
 def assign_cf_metadata(ds: xr.Dataset, cf_ds: CFDataset) -> xr.Dataset:
