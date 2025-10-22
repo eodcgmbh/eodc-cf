@@ -141,6 +141,4 @@ class CFDataset(BaseModel):
     
 
 if __name__ == "__main__":
-    coord = CFDataVariable(name="hello", standard_name="hello", long_name="12", _FillValue=1, attrs={"b123": "123"})
-    print(coord.to_dict())
-    print(coord.coordinates)
+    pass
