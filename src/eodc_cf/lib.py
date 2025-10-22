@@ -1,4 +1,4 @@
-from _core import CFCoordinate
+from eodc_cf._core import CFCoordinate
 
 
 class CFLonCoordinate(CFCoordinate):
