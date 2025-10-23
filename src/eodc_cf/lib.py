@@ -1,5 +1,6 @@
-from eodc_cf._core import CFCoordinate
+from eodc_cf._core import CFDataset, CFDataVariable, CFFlagVariable, CFCoordinate
 
+__all__ = CFDataset + CFDataVariable + CFFlagVariable + CFCoordinate
 
 class CFLonCoordinate(CFCoordinate):
     def __init__(self, **kwargs):
