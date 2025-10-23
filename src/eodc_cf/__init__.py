@@ -1,7 +1,8 @@
-from eodc_cf._core import CFDataset#CFDataVariable, CFDataset, CFCoordinate
+#CFDataVariable, CFDataset, CFCoordinate
 #from eodc_cf.lib import CFLatCoordinate, CFLonCoordinate, CFXCoordinate, CFYCoordinate, CFTimeCoordinate
 from eodc_cf._version import __version__
 from eodc_cf._version import __commit__
+from eodc_cf._core import CFDataset
 
 name = "eodc_cf"
 
