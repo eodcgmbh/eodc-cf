@@ -5,7 +5,11 @@ dynamic = ["version"]
 description = "Generic and light-weight package to assist CF-compliant dataset creation"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pydantic",
+    "gdal",
+    "xarray"
+]
 classifiers = [
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
