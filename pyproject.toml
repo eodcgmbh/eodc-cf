@@ -25,7 +25,7 @@ classifiers = [
 Repository = "https://github.com/eodcgmbh/eodc-cf"
 
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "pydantic"]
 build-backend = "setuptools.build_meta"
 
 [dependency-groups]
