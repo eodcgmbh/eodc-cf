@@ -5,6 +5,7 @@ from eodc_cf._core import (
     CFFlagVariable,
     CFMultiscaleAttributes,
     CFMultiscaleDataset,
+    CFMultiscaleLayout,
 )
 from eodc_cf._lib import (
     CFLatCoordinate,
