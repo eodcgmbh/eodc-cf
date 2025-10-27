@@ -4,7 +4,7 @@ name = "eodc_cf"
 dynamic = ["version"]
 description = "Generic and light-weight package to assist CF-compliant dataset creation"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.12"
 dependencies = [
     "pydantic",
     "gdal",
@@ -15,8 +15,6 @@ classifiers = [
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: GIS",
     "Topic :: Software Development :: Libraries",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.12",
     "Operating System :: POSIX",
     "Natural Language :: English",
@@ -34,3 +32,24 @@ test = [
     "pytest-cov"
 ]
 trunk = []
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+skip-string-normalization = false
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+lint.select = ["E", "F", "I", "B", "UP", "N"]
+lint.ignore = [
+  "E501", # ignore line length warnings because Black handles that
+]
+
+# Optional: autofix simple issues when running `ruff check --fix`
+fix = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["eodc_cf"]
+combine-as-imports = true
