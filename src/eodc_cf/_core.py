@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, AfterValidator
-from typing import Optional, Annotated, Union, List, Dict
+from typing import Optional, Annotated, Union, List, Dict, Tuple
 from typing_extensions import TypedDict
 import re
 import copy
@@ -47,7 +47,8 @@ class CFCoordinate(CFBase):
     axis: Optional[Annotated[str, validate_axis_name]] = None
     units: Optional[str] = None
 
-    def to_dict(self) -> dict:
+    @property
+    def attrs(self) -> dict:
         metadata = super().model_dump(exclude=["name"], exclude_none=True)
         return metadata
 
@@ -56,7 +57,7 @@ class CFDataVariableBase(CFBase):
     fill_value: Optional[float] = 0
     valid_range: Optional[tuple] = None
     grid_mapping: Annotated[str, AfterValidator(validate_variable_name)] = None
-    attrs: Optional[CFAttributes] = {}
+    other_attrs: Optional[CFAttributes] = {}
 
     _coordinates = {}
 
@@ -72,10 +73,11 @@ class CFDataVariableBase(CFBase):
 
         return self
     
-    def to_dict(self) -> dict:
-        attrs = super().model_dump(exclude=["name", "fill_value", "attrs"], exclude_none=True)
+    @property
+    def attrs(self) -> dict:
+        attrs = super().model_dump(exclude=["name", "fill_value", "other_attrs"], exclude_none=True)
         attrs["_FillValue"] = self.fill_value
-        metadata = copy.deepcopy(self.attrs)
+        metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)
 
         return metadata
@@ -97,8 +99,9 @@ class CFFlagVariable(CFDataVariableBase):
     flag_masks: list
     flag_meanings: list[Annotated[str, validate_long_name]]
 
-    def to_dict(self) -> dict:
-        metadata = super().to_dict()
+    @property
+    def attrs(self) -> dict:
+        metadata = super().attrs
         metadata["flag_meanings"] = " ".join(metadata["flag_meanings"])
         return metadata
 
@@ -110,7 +113,7 @@ class CFDataset(BaseModel):
     history: Optional[str] = None
     references: Optional[List[str]] = None
     comment: Optional[str] = None
-    attrs: Optional[CFAttributes] = {}
+    other_attrs: Optional[CFAttributes] = {}
 
     _variables = {}
 
@@ -132,15 +135,41 @@ class CFDataset(BaseModel):
 
         return self
     
-    def to_dict(self) -> dict:
-        attrs = super().model_dump(exclude=["attrs"], exclude_none=True)
-        metadata = copy.deepcopy(self.attrs)
+    @property
+    def attrs(self) -> dict:
+        attrs = super().model_dump(exclude=["other_attrs"], exclude_none=True)
+        metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)
 
         return metadata
+
+
+class CFMultiscaleLayout(BaseModel):
+    id: str
+    cell_size: Tuple[float, float]
+    path: Optional[str | None] = None
+    derived_from: Optional[str | None] = None
+    factors: Optional[Tuple[float, float] | None] = None
+    resampling_method: Optional[Annotated[str, AfterValidator(validate_variable_name)]  | None] = None
+
+
+class CFMultiscaleAttributes(BaseModel):
+    layout: list[CFMultiscaleLayout]
+    version: str = "1.0"
+    tile_matrix_ref: Optional[str | None] = None
+    resampling_method: Optional[Annotated[str, AfterValidator(validate_variable_name)]  | None] = None
+    overview_variables: Optional[list[Annotated[str, AfterValidator(validate_variable_name)]]] = None
+
+    def __add__(self, other: CFMultiscaleLayout) -> 'CFMultiscaleAttributes':
+        self.layout.append(other)   
+        return self
+
+
+class CFMultiscaleDataset(CFDataset):
+    multiscales: CFMultiscaleAttributes
     
 
-#__all__ = CFDataset
+
 
 if __name__ == "__main__":
     pass
