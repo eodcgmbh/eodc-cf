@@ -22,6 +22,6 @@ jobs:
       - name: Install dependencies
         run: |
           python3 -m pip install --upgrade pip setuptools
-          python3 -m pip install -e .[test]
+          python3 -m pip install -e . --group test
       - name: Test
         run: pytest --verbose --color=yes --cov=eodc-cf --cov-report term-missing
