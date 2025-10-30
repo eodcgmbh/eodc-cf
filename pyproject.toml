@@ -4,10 +4,9 @@ name = "eodc_cf"
 dynamic = ["version"]
 description = "Generic and light-weight package to assist CF-compliant dataset creation"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.10"
 dependencies = [
     "pydantic",
-    "gdal",
     "xarray"
 ]
 classifiers = [
