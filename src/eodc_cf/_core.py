@@ -3,7 +3,6 @@ import re
 from typing import Annotated, Union
 
 from pydantic import AfterValidator, BaseModel, Field
-from typing_extensions import TypedDict
 
 
 def validate_variable_name(input: str) -> str:
@@ -39,9 +38,12 @@ def validate_axis_name(input: str | None) -> str:
     return input
 
 
-class CFAttributes(TypedDict, total=False):
-    name: Annotated[str, AfterValidator(validate_variable_name)] | None
-    value: str
+def validate_attributes(input: dict | None) -> dict:
+    input = input or {}
+    for k in input.keys():
+        validate_variable_name(k)
+
+    return input
 
 
 class CFBase(BaseModel):
@@ -66,7 +68,7 @@ class CFDataVariableBase(CFBase):
     fill_value: float | None = 0
     valid_range: tuple | None = None
     grid_mapping: Annotated[str, AfterValidator(validate_variable_name)] = None
-    other_attrs: CFAttributes | None = {}
+    other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
     _coordinates = {}
 
@@ -87,7 +89,8 @@ class CFDataVariableBase(CFBase):
         attrs = super().model_dump(
             exclude=["name", "fill_value", "other_attrs"], exclude_none=True
         )
-        attrs["_FillValue"] = self.fill_value
+        if self.fill_value is not None:
+            attrs["_FillValue"] = self.fill_value
         metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)
 
@@ -123,7 +126,7 @@ class CFDataset(BaseModel):
     history: str | None = None
     references: list[str] | None = None
     comment: str | None = None
-    other_attrs: CFAttributes | None = {}
+    other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
     _variables = {}
 
