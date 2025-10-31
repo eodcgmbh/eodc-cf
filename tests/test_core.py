@@ -355,4 +355,4 @@ def test_cf_ms_ds():
 
 
 if __name__ == "__main__":
-    test_cf_ms_ds()
+    pass
