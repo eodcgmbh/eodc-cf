@@ -55,7 +55,7 @@ class CFBase(BaseModel):
 
 
 class CFCoordinate(CFBase):
-    axis: Annotated[str, validate_axis_name] | None = None
+    axis: Annotated[str, AfterValidator(validate_axis_name)] | None = None
     units: str | None = None
 
     @property
@@ -65,8 +65,8 @@ class CFCoordinate(CFBase):
 
 
 class CFDataVariableBase(CFBase):
-    fill_value: float | None = 0
-    valid_range: tuple | None = None
+    fill_value: int | float | None = 0
+    valid_range: tuple[int | float, int | float] | None = None
     grid_mapping: Annotated[str, AfterValidator(validate_variable_name)] = None
     other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
@@ -76,13 +76,17 @@ class CFDataVariableBase(CFBase):
         super().__init__(**kwargs)
         if cf_coords:
             for cf_coord in cf_coords:
-                self._coordinates[cf_coord.name] = cf_coord
+                if isinstance(cf_coord, CFCoordinate):
+                    self._coordinates[cf_coord.name] = cf_coord
 
     def __add__(self, other: CFCoordinate) -> "CFDataVariableBase":
         if isinstance(other, CFCoordinate):
             self._coordinates.update({other.name: other})
 
         return self
+
+    def __len__(self) -> int:
+        return len(self._coordinates)
 
     @property
     def attrs(self) -> dict:
@@ -102,15 +106,16 @@ class CFDataVariableBase(CFBase):
 
 
 class CFDataVariable(CFDataVariableBase):
-    scale_factor: float | None = 1.0
-    add_offset: float | None = 0
+    scale_factor: int | float | None = 1.0
+    add_offset: int | float | None = 0
     units: str | None = None
 
 
 class CFFlagVariable(CFDataVariableBase):
+    fill_value: int | None = 255
     flag_values: list
-    flag_masks: list
-    flag_meanings: list[Annotated[str, validate_long_name]]
+    flag_masks: list | None = None
+    flag_meanings: list[Annotated[str, AfterValidator(validate_long_name)]]
 
     @property
     def attrs(self) -> dict:
@@ -134,19 +139,27 @@ class CFDataset(BaseModel):
     def variables(self) -> dict[str, CFDataVariable | CFFlagVariable]:
         return self._variables
 
-    def __init__(self, cf_vars: list[CFDataVariable] | None = None, **kwargs):
+    def __init__(
+        self, cf_vars: list[CFDataVariable | CFFlagVariable] | None = None, **kwargs
+    ):
         super().__init__(**kwargs)
         if cf_vars:
             for cf_var in cf_vars:
-                self._variables[cf_var.name] = cf_var
+                if isinstance(cf_var, CFDataVariable | CFFlagVariable):
+                    self._variables[cf_var.name] = cf_var
 
-    def __add__(self, other: Union["CFDataset", CFDataVariable]) -> "CFDataset":
+    def __add__(
+        self, other: Union["CFDataset", CFDataVariable, CFFlagVariable]
+    ) -> "CFDataset":
         if isinstance(other, CFDataset):
             self._variables.update(other.variables)
-        elif isinstance(other, CFDataVariable):
+        elif isinstance(other, CFDataVariable | CFFlagVariable):
             self._variables.update({other.name: other})
 
         return self
+
+    def __len__(self) -> int:
+        return len(self._variables)
 
     @property
     def attrs(self) -> dict:
@@ -160,28 +173,61 @@ class CFDataset(BaseModel):
 class CFMultiscaleLayout(BaseModel):
     id: str
     cell_size: tuple[float, float]
-    path: str | None | None = None
-    derived_from: str | None | None = None
-    factors: tuple[float, float] | None | None = None
-    resampling_method: (
-        Annotated[str, AfterValidator(validate_variable_name)] | None | None
-    ) = None
+    path: str | None = None
+    derived_from: str | None = None
+    factors: tuple[float, float] | None = None
+    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
+        None
+    )
+
+
+def validate_ms_layouts(input: list[CFMultiscaleLayout]) -> list[CFMultiscaleLayout]:
+    ids = []
+    for layout in input:
+        if layout.id in ids:
+            raise KeyError(
+                f"{layout.id} appears multiple times. Each layout element needs to have a unique ID."
+            )
+        ids.append(layout.id)
+
+    return input
+
+
+def validate_resampling_method(rm: str | None, grp_rm: str | None) -> bool:
+    res_match = True
+    if grp_rm is not None and rm is not None:
+        res_match = grp_rm == rm
+
+    return res_match
 
 
 class CFMultiscaleAttributes(BaseModel):
-    layout: list[CFMultiscaleLayout]
+    layout: Annotated[list[CFMultiscaleLayout], AfterValidator(validate_ms_layouts)]
     version: str = "1.0"
-    tile_matrix_ref: str | None | None = None
-    resampling_method: (
-        Annotated[str, AfterValidator(validate_variable_name)] | None | None
-    ) = None
+    tile_matrix_ref: str | None = None
+    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
+        None
+    )
     overview_variables: (
         list[Annotated[str, AfterValidator(validate_variable_name)]] | None
     ) = None
 
+    @property
+    def ids(self) -> list[str]:
+        return [layout.id for layout in self.layout]
+
     def __add__(self, other: CFMultiscaleLayout) -> "CFMultiscaleAttributes":
-        self.layout.append(other)
+        new_id = other.id not in self.ids
+        rm_match = validate_resampling_method(
+            other.resampling_method, self.resampling_method
+        )
+        if new_id and rm_match:
+            self.layout.append(other)
+
         return self
+
+    def __len__(self) -> int:
+        return len(self.layout)
 
 
 class CFMultiscaleDataset(CFDataset):
