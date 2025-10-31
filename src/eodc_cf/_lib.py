@@ -46,8 +46,6 @@ class CFYCoordinate(CFCoordinate):
 
 
 class CFTimeCoordinate(CFCoordinate):
-    units: str
-
     def __init__(self, **kwargs):
         super().__init__(standard_name="time", axis="T", **kwargs)
 
