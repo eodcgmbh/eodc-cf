@@ -57,10 +57,14 @@ class CFBase(BaseModel):
 class CFCoordinate(CFBase):
     axis: Annotated[str, AfterValidator(validate_axis_name)] | None = None
     units: str | None = None
+    other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
     @property
     def attrs(self) -> dict:
-        metadata = super().model_dump(exclude=["name"], exclude_none=True)
+        attrs = super().model_dump(exclude=["name", "other_attrs"], exclude_none=True)
+        metadata = copy.deepcopy(self.other_attrs)
+        metadata.update(attrs)
+
         return metadata
 
 
