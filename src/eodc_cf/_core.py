@@ -6,7 +6,7 @@ from pydantic import AfterValidator, BaseModel, Field
 
 
 def validate_variable_name(input: str) -> str:
-    pattern = re.compile(r"^[a-z][a-z_0-9]*$")
+    pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9]*$")
 
     if not pattern.match(input):
         raise Exception(
@@ -17,7 +17,7 @@ def validate_variable_name(input: str) -> str:
 
 
 def validate_long_name(input: str | None) -> str:
-    pattern = re.compile(r"^[a-z_0-9][a-z_0-9\s(),]+$")
+    pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
 
     if input and not pattern.match(input):
         raise Exception(
