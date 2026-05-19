@@ -21,11 +21,14 @@ def test_cf_base():
         "long_name": None,
     }
 
+    cf_base = CFBase(name="Var", standard_name="var_name")
+    assert cf_base.name == "Var"
+
     try:
-        cf_base = CFBase(name="Var", standard_name="var_name")
+        cf_base = CFBase(name="1var", standard_name="var_name")
         raise AssertionError()
     except Exception as e:
-        assert str(e) == "String 'Var' does not comply with the CF naming convention."
+        assert str(e) == "String '1var' does not comply with the CF naming convention."
 
     try:
         cf_base = CFBase(name="var")
@@ -48,6 +51,7 @@ def test_cf_coordinate():
         "long_name": None,
         "axis": "Z",
         "units": "m",
+        "other_attrs": {},
     }
 
     try:
@@ -97,29 +101,31 @@ def test_cf_datavar_base():
     except ValidationError:
         assert True
 
+    cf_dvar = CFDataVariableBase(
+        name="var", standard_name="var_name", grid_mapping="SPATIAL_REF"
+    )
+    assert cf_dvar.grid_mapping == "SPATIAL_REF"
+
     try:
         cf_dvar = CFDataVariableBase(
-            name="var", standard_name="var_name", grid_mapping="SPATIAL_REF"
+            name="var", standard_name="var_name", other_attrs={"bad-name": 123}
         )
         raise AssertionError()
     except Exception as e:
         assert (
             str(e)
-            == "String 'SPATIAL_REF' does not comply with the CF naming convention."
+            == "String 'bad-name' does not comply with the CF naming convention."
         )
-
-    try:
-        cf_dvar = CFDataVariableBase(
-            name="var", standard_name="var_name", other_attrs={"TEST": 123}
-        )
-        raise AssertionError()
-    except Exception as e:
-        assert str(e) == "String 'TEST' does not comply with the CF naming convention."
 
     cf_dvar = CFDataVariableBase(
         name="var", standard_name="var_name", other_attrs={"test": 123}
     )
     assert cf_dvar.attrs == {"standard_name": "var_name", "_FillValue": 0, "test": 123}
+
+    cf_dvar = CFDataVariableBase(
+        name="var", standard_name="var_name", other_attrs={"TEST": 123}
+    )
+    assert cf_dvar.attrs == {"standard_name": "var_name", "_FillValue": 0, "TEST": 123}
 
 
 def test_cf_datavar():

@@ -1,6 +1,22 @@
 # eodc-cf
 
-Generic and light-weight package to assist CF-compliant dataset creation
+Generic and light-weight package to assist CF-compliant dataset creation.
+
+> **GeoZarr note.** `eodc-cf` is a **CF-conventions** helper. It does *not*
+> implement the [GeoZarr](https://geozarr.org) conventions (`geo-proj`,
+> `spatial`, `multiscales`). The `CFMultiscale{Layout,Attributes,Dataset}`
+> models in this package predate and are **incompatible** with the
+> GeoZarr `multiscales` convention (different UUID, different attribute
+> names, no JSON Schema). They are kept importable for backwards
+> compatibility but emit a `DeprecationWarning` on instantiation and will
+> be removed in a future release.
+>
+> For spec-compliant GeoZarr metadata use
+> [`zarr-cm`](https://github.com/zarr-conventions/zarr-cm) (primitives,
+> zero-dep) or [`geozarr-toolkit`](https://github.com/zarr-developers/geozarr-toolkit)
+> (Pydantic models + CLI). The CF helpers in this package remain useful
+> for variable-level CF metadata (`standard_name`, `_FillValue`, etc.) and
+> are *complementary* to GeoZarr.
 
 # Installation
 

@@ -1,12 +1,31 @@
 import copy
 import re
-from typing import Annotated, Union
+import warnings
+from typing import Annotated, Any, Union
 
 from pydantic import AfterValidator, BaseModel, Field
 
+_CFMULTISCALE_DEPRECATION_MSG = (
+    "eodc_cf.CFMultiscale{Layout,Attributes,Dataset} predate and do not "
+    "implement the GeoZarr `multiscales` convention (wrong UUID, wrong "
+    "attribute names, no JSON Schema). They are scheduled for removal in a "
+    "future release. For GeoZarr-compliant multiscales metadata, use "
+    "`zarr-cm` (https://github.com/zarr-conventions/zarr-cm) or the higher-"
+    "level `geozarr-toolkit`."
+)
+
+
+def _warn_cfmultiscale_deprecated() -> None:
+    """Emit the soft-removal warning for the CFMultiscale* family."""
+    warnings.warn(
+        _CFMULTISCALE_DEPRECATION_MSG,
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
 
 def validate_variable_name(input: str) -> str:
-    pattern = re.compile(r"^[a-z][a-z_0-9]*$")
+    pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9]*$")
 
     if not pattern.match(input):
         raise Exception(
@@ -17,7 +36,7 @@ def validate_variable_name(input: str) -> str:
 
 
 def validate_long_name(input: str | None) -> str:
-    pattern = re.compile(r"^[a-z_0-9][a-z_0-9\s]+$")
+    pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
 
     if input and not pattern.match(input):
         raise Exception(
@@ -57,10 +76,14 @@ class CFBase(BaseModel):
 class CFCoordinate(CFBase):
     axis: Annotated[str, AfterValidator(validate_axis_name)] | None = None
     units: str | None = None
+    other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
     @property
     def attrs(self) -> dict:
-        metadata = super().model_dump(exclude=["name"], exclude_none=True)
+        attrs = super().model_dump(exclude=["name", "other_attrs"], exclude_none=True)
+        metadata = copy.deepcopy(self.other_attrs)
+        metadata.update(attrs)
+
         return metadata
 
 
@@ -180,6 +203,10 @@ class CFMultiscaleLayout(BaseModel):
         None
     )
 
+    def __init__(self, **data: Any) -> None:
+        _warn_cfmultiscale_deprecated()
+        super().__init__(**data)
+
 
 def validate_ms_layouts(input: list[CFMultiscaleLayout]) -> list[CFMultiscaleLayout]:
     ids = []
@@ -212,6 +239,10 @@ class CFMultiscaleAttributes(BaseModel):
         list[Annotated[str, AfterValidator(validate_variable_name)]] | None
     ) = None
 
+    def __init__(self, **data: Any) -> None:
+        _warn_cfmultiscale_deprecated()
+        super().__init__(**data)
+
     @property
     def ids(self) -> list[str]:
         return [layout.id for layout in self.layout]
@@ -232,6 +263,10 @@ class CFMultiscaleAttributes(BaseModel):
 
 class CFMultiscaleDataset(CFDataset):
     multiscales: CFMultiscaleAttributes
+
+    def __init__(self, **data: Any) -> None:
+        _warn_cfmultiscale_deprecated()
+        super().__init__(**data)
 
 
 if __name__ == "__main__":
