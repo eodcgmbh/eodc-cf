@@ -3,9 +3,6 @@ from eodc_cf._core import (
     CFDataset,
     CFDataVariable,
     CFFlagVariable,
-    CFMultiscaleAttributes,
-    CFMultiscaleDataset,
-    CFMultiscaleLayout,
 )
 from eodc_cf._lib import (
     CFLatCoordinate,
@@ -23,9 +20,6 @@ __all__ = [
     "CFDataVariable",
     "CFFlagVariable",
     "CFCoordinate",
-    "CFMultiscaleAttributes",
-    "CFMultiscaleLayout",
-    "CFMultiscaleDataset",
     "CFLonCoordinate",
     "CFLatCoordinate",
     "CFXCoordinate",

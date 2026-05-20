@@ -4,14 +4,7 @@ Generic and light-weight package to assist CF-compliant dataset creation.
 
 > **GeoZarr note.** `eodc-cf` is a **CF-conventions** helper. It does *not*
 > implement the [GeoZarr](https://geozarr.org) conventions (`geo-proj`,
-> `spatial`, `multiscales`). The `CFMultiscale{Layout,Attributes,Dataset}`
-> models in this package predate and are **incompatible** with the
-> GeoZarr `multiscales` convention (different UUID, different attribute
-> names, no JSON Schema). They are kept importable for backwards
-> compatibility but emit a `DeprecationWarning` on instantiation and will
-> be removed in a future release.
->
-> For spec-compliant GeoZarr metadata use
+> `spatial`, `multiscales`). For spec-compliant GeoZarr metadata use
 > [`zarr-cm`](https://github.com/zarr-conventions/zarr-cm) (primitives,
 > zero-dep) or [`geozarr-toolkit`](https://github.com/zarr-developers/geozarr-toolkit)
 > (Pydantic models + CLI). The CF helpers in this package remain useful
@@ -198,69 +191,6 @@ pprint(cf_ds1.variables)
 
     {'qflag': CFFlagVariable(name='qflag', standard_name='quality_flag', long_name=None, fill_value=255, valid_range=None, grid_mapping=None, other_attrs={}, flag_values=[1, 2, 4], flag_masks=None, flag_meanings=['processing_successfull', 'retrieval_successful', 'quality_good']),
      'temp': CFDataVariable(name='temp', standard_name='temperature', long_name=None, fill_value=-9999, valid_range=None, grid_mapping=None, other_attrs={}, scale_factor=1.0, add_offset=0, units='degrees_celsius')}
-
-
-### Multiscale dataset
-
-An extension of the `CFDataset` is the `CFMultiscaleDataset`, which pre-defines the expected attributes to represent an "image pyramid"-like structure of the dataset. Each pyramid level is called a "layout" and is defined via the `CFMultiscaleLayout` class. 
-
-
-```python
-from eodc_cf import CFMultiscaleLayout
-
-cf_ms_l0 = CFMultiscaleLayout(id="L0", cell_size=(1, 1))
-pprint(cf_ms_l0)
-```
-
-    CFMultiscaleLayout(id='L0', cell_size=(1.0, 1.0), path=None, derived_from=None, factors=None, resampling_method=None)
-
-
-`CFMultiscaleAttributes` then allows to define a set of layouts and some relevant metadata:
-
-
-```python
-from eodc_cf import CFMultiscaleAttributes
-
-cf_ms_attrs = CFMultiscaleAttributes(
-    layout=[cf_ms_l0], resampling_method="nearest"
-)
-pprint(cf_ms_attrs)
-```
-
-    CFMultiscaleAttributes(layout=[CFMultiscaleLayout(id='L0', cell_size=(1.0, 1.0), path=None, derived_from=None, factors=None, resampling_method=None)], version='1.0', tile_matrix_ref=None, resampling_method='nearest', overview_variables=None)
-
-
-Also with `CFMultiscaleAttributes`, more multiscale layouts/layers can be added on-the-fly:
-
-
-```python
-cf_ms_l1 = CFMultiscaleLayout(id="L1", cell_size=(2, 2))
-cf_ms_l2 = CFMultiscaleLayout(id="L2", cell_size=(4, 4))
-cf_ms_attrs = cf_ms_attrs + cf_ms_l1 + cf_ms_l2
-print(len(cf_ms_attrs))
-```
-
-    3
-
-
-Finally, the `CFMultiscaleAttributes` instance can be attached to the `CFMultiscaleDataset` class. This class has then the same properties as a common `CFDataset` with a `multiscales` attribute on top.
-
-
-```python
-from eodc_cf import CFMultiscaleDataset
-
-cf_ms_ds = CFMultiscaleDataset(title="multiscale dataset", source="my source", multiscales=cf_ms_attrs)
-pprint(cf_ms_ds.attrs)
-```
-
-    {'institution': 'EODC',
-     'multiscales': {'layout': [{'cell_size': (1.0, 1.0), 'id': 'L0'},
-                                {'cell_size': (2.0, 2.0), 'id': 'L1'},
-                                {'cell_size': (4.0, 4.0), 'id': 'L2'}],
-                     'resampling_method': 'nearest',
-                     'version': '1.0'},
-     'source': 'my source',
-     'title': 'multiscale dataset'}
 
 
 # Testing

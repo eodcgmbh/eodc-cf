@@ -1,27 +1,8 @@
 import copy
 import re
-import warnings
-from typing import Annotated, Any, Union
+from typing import Annotated, Union
 
 from pydantic import AfterValidator, BaseModel, Field
-
-_CFMULTISCALE_DEPRECATION_MSG = (
-    "eodc_cf.CFMultiscale{Layout,Attributes,Dataset} predate and do not "
-    "implement the GeoZarr `multiscales` convention (wrong UUID, wrong "
-    "attribute names, no JSON Schema). They are scheduled for removal in a "
-    "future release. For GeoZarr-compliant multiscales metadata, use "
-    "`zarr-cm` (https://github.com/zarr-conventions/zarr-cm) or the higher-"
-    "level `geozarr-toolkit`."
-)
-
-
-def _warn_cfmultiscale_deprecated() -> None:
-    """Emit the soft-removal warning for the CFMultiscale* family."""
-    warnings.warn(
-        _CFMULTISCALE_DEPRECATION_MSG,
-        DeprecationWarning,
-        stacklevel=3,
-    )
 
 
 def validate_variable_name(input: str) -> str:
@@ -191,82 +172,6 @@ class CFDataset(BaseModel):
         metadata.update(attrs)
 
         return metadata
-
-
-class CFMultiscaleLayout(BaseModel):
-    id: str
-    cell_size: tuple[float, float]
-    path: str | None = None
-    derived_from: str | None = None
-    factors: tuple[float, float] | None = None
-    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
-        None
-    )
-
-    def __init__(self, **data: Any) -> None:
-        _warn_cfmultiscale_deprecated()
-        super().__init__(**data)
-
-
-def validate_ms_layouts(input: list[CFMultiscaleLayout]) -> list[CFMultiscaleLayout]:
-    ids = []
-    for layout in input:
-        if layout.id in ids:
-            raise KeyError(
-                f"{layout.id} appears multiple times. Each layout element needs to have a unique ID."
-            )
-        ids.append(layout.id)
-
-    return input
-
-
-def validate_resampling_method(rm: str | None, grp_rm: str | None) -> bool:
-    res_match = True
-    if grp_rm is not None and rm is not None:
-        res_match = grp_rm == rm
-
-    return res_match
-
-
-class CFMultiscaleAttributes(BaseModel):
-    layout: Annotated[list[CFMultiscaleLayout], AfterValidator(validate_ms_layouts)]
-    version: str = "1.0"
-    tile_matrix_ref: str | None = None
-    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
-        None
-    )
-    overview_variables: (
-        list[Annotated[str, AfterValidator(validate_variable_name)]] | None
-    ) = None
-
-    def __init__(self, **data: Any) -> None:
-        _warn_cfmultiscale_deprecated()
-        super().__init__(**data)
-
-    @property
-    def ids(self) -> list[str]:
-        return [layout.id for layout in self.layout]
-
-    def __add__(self, other: CFMultiscaleLayout) -> "CFMultiscaleAttributes":
-        new_id = other.id not in self.ids
-        rm_match = validate_resampling_method(
-            other.resampling_method, self.resampling_method
-        )
-        if new_id and rm_match:
-            self.layout.append(other)
-
-        return self
-
-    def __len__(self) -> int:
-        return len(self.layout)
-
-
-class CFMultiscaleDataset(CFDataset):
-    multiscales: CFMultiscaleAttributes
-
-    def __init__(self, **data: Any) -> None:
-        _warn_cfmultiscale_deprecated()
-        super().__init__(**data)
 
 
 if __name__ == "__main__":

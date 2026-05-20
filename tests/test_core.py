@@ -7,9 +7,6 @@ from eodc_cf._core import (
     CFDataVariable,
     CFDataVariableBase,
     CFFlagVariable,
-    CFMultiscaleAttributes,
-    CFMultiscaleDataset,
-    CFMultiscaleLayout,
 )
 
 
@@ -260,104 +257,6 @@ def test_combine_cf_ds():
     n_vars = len(cf_ds1) + len(cf_ds2)
     cf_ds1 = cf_ds1 + cf_ds2
     assert len(cf_ds1) == n_vars
-
-
-def test_cf_ms_layout():
-    cf_ms_layout = CFMultiscaleLayout(id="L0", cell_size=(1, 1))
-    assert cf_ms_layout.model_dump() == {
-        "id": "L0",
-        "cell_size": (1.0, 1.0),
-        "path": None,
-        "derived_from": None,
-        "resampling_method": None,
-        "factors": None,
-    }
-
-
-def test_cf_ms_attrs():
-    cf_ms_layout1 = CFMultiscaleLayout(id="L0", cell_size=(1, 1))
-    cf_ms_layout2 = CFMultiscaleLayout(id="L1", cell_size=(2, 2))
-    cf_ms_layout3 = CFMultiscaleLayout(
-        id="L2", cell_size=(4, 4), resampling_method="average"
-    )
-    cf_ms_attrs = CFMultiscaleAttributes(
-        layout=[cf_ms_layout1], resampling_method="nearest"
-    )
-
-    assert cf_ms_attrs.model_dump() == {
-        "layout": [
-            {
-                "id": "L0",
-                "cell_size": (1.0, 1.0),
-                "path": None,
-                "derived_from": None,
-                "resampling_method": None,
-                "factors": None,
-            }
-        ],
-        "version": "1.0",
-        "tile_matrix_ref": None,
-        "resampling_method": "nearest",
-        "overview_variables": None,
-    }
-
-    assert len(cf_ms_attrs) == 1
-    cf_ms_attrs = cf_ms_attrs + cf_ms_layout1
-    assert len(cf_ms_attrs) == 1
-    cf_ms_attrs = cf_ms_attrs + cf_ms_layout2
-    assert len(cf_ms_attrs) == 2
-    cf_ms_attrs = cf_ms_attrs + cf_ms_layout3
-    assert len(cf_ms_attrs) == 2
-
-
-def test_cf_ms_ds():
-    cf_ms_layout1 = CFMultiscaleLayout(id="L0", cell_size=(1, 1))
-    cf_ms_attrs = CFMultiscaleAttributes(
-        layout=[cf_ms_layout1], resampling_method="nearest"
-    )
-    cf_ms_ds = CFMultiscaleDataset(
-        title="msdataset", source="source", multiscales=cf_ms_attrs
-    )
-    assert cf_ms_ds.model_dump() == {
-        "title": "msdataset",
-        "source": "source",
-        "institution": "EODC",
-        "history": None,
-        "references": None,
-        "comment": None,
-        "other_attrs": {},
-        "multiscales": {
-            "layout": [
-                {
-                    "id": "L0",
-                    "cell_size": (1.0, 1.0),
-                    "path": None,
-                    "derived_from": None,
-                    "resampling_method": None,
-                    "factors": None,
-                }
-            ],
-            "version": "1.0",
-            "tile_matrix_ref": None,
-            "resampling_method": "nearest",
-            "overview_variables": None,
-        },
-    }
-    assert cf_ms_ds.attrs == {
-        "title": "msdataset",
-        "source": "source",
-        "institution": "EODC",
-        "multiscales": {
-            "layout": [
-                {
-                    "id": "L0",
-                    "cell_size": (1.0, 1.0),
-                }
-            ],
-            "version": "1.0",
-            "resampling_method": "nearest",
-        },
-    }
 
 
 if __name__ == "__main__":
