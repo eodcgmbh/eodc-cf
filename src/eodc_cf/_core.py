@@ -18,6 +18,17 @@ def validate_variable_name(arg: str) -> str:
     return arg
 
 
+def validate_attribute_name(arg: str) -> str:
+    """Check if attribute does not contain invalid characters."""
+    pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9:]*$")
+
+    if not pattern.match(arg):
+        err_msg = f"Attribute '{arg}' does not comply with the CF naming convention."
+        raise ValueError(err_msg)
+
+    return arg
+
+
 def validate_long_name(arg: str | None) -> str:
     """Check if input contains characters not permitted in a CF long name."""
     pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
@@ -41,10 +52,10 @@ def validate_axis_name(arg: str | None) -> str:
 
 
 def validate_attributes(arg: dict | None) -> dict:
-    """Check if any key in the dict is not a valid CF variable name."""
+    """Check if any key in the dict is not a valid CF attribute name."""
     arg = arg or {}
     for k in arg:
-        validate_variable_name(k)
+        validate_attribute_name(k)
 
     return arg
 

@@ -120,6 +120,15 @@ def test_cf_datavar_base():
     )
     assert cf_dvar.attrs == {"standard_name": "var_name", "_FillValue": 0, "TEST": 123}
 
+    cf_dvar = CFDataVariableBase(
+        name="var", standard_name="var_name", other_attrs={"example:attr": 123}
+    )
+    assert cf_dvar.attrs == {
+        "standard_name": "var_name",
+        "_FillValue": 0,
+        "example:attr": 123,
+    }
+
 
 def test_cf_datavar():
     cf_dvar = CFDataVariable(
