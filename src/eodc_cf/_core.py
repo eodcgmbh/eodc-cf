@@ -6,7 +6,7 @@ from pydantic import AfterValidator, BaseModel, Field
 
 
 def validate_variable_name(input: str) -> str:
-    pattern = re.compile(r"^[a-z][a-z_0-9]*$")
+    pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9]*$")
 
     if not pattern.match(input):
         raise Exception(
@@ -17,7 +17,7 @@ def validate_variable_name(input: str) -> str:
 
 
 def validate_long_name(input: str | None) -> str:
-    pattern = re.compile(r"^[a-z_0-9][a-z_0-9\s]+$")
+    pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
 
     if input and not pattern.match(input):
         raise Exception(
@@ -57,10 +57,14 @@ class CFBase(BaseModel):
 class CFCoordinate(CFBase):
     axis: Annotated[str, AfterValidator(validate_axis_name)] | None = None
     units: str | None = None
+    other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
     @property
     def attrs(self) -> dict:
-        metadata = super().model_dump(exclude=["name"], exclude_none=True)
+        attrs = super().model_dump(exclude=["name", "other_attrs"], exclude_none=True)
+        metadata = copy.deepcopy(self.other_attrs)
+        metadata.update(attrs)
+
         return metadata
 
 
@@ -168,70 +172,6 @@ class CFDataset(BaseModel):
         metadata.update(attrs)
 
         return metadata
-
-
-class CFMultiscaleLayout(BaseModel):
-    id: str
-    cell_size: tuple[float, float]
-    path: str | None = None
-    derived_from: str | None = None
-    factors: tuple[float, float] | None = None
-    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
-        None
-    )
-
-
-def validate_ms_layouts(input: list[CFMultiscaleLayout]) -> list[CFMultiscaleLayout]:
-    ids = []
-    for layout in input:
-        if layout.id in ids:
-            raise KeyError(
-                f"{layout.id} appears multiple times. Each layout element needs to have a unique ID."
-            )
-        ids.append(layout.id)
-
-    return input
-
-
-def validate_resampling_method(rm: str | None, grp_rm: str | None) -> bool:
-    res_match = True
-    if grp_rm is not None and rm is not None:
-        res_match = grp_rm == rm
-
-    return res_match
-
-
-class CFMultiscaleAttributes(BaseModel):
-    layout: Annotated[list[CFMultiscaleLayout], AfterValidator(validate_ms_layouts)]
-    version: str = "1.0"
-    tile_matrix_ref: str | None = None
-    resampling_method: Annotated[str, AfterValidator(validate_variable_name)] | None = (
-        None
-    )
-    overview_variables: (
-        list[Annotated[str, AfterValidator(validate_variable_name)]] | None
-    ) = None
-
-    @property
-    def ids(self) -> list[str]:
-        return [layout.id for layout in self.layout]
-
-    def __add__(self, other: CFMultiscaleLayout) -> "CFMultiscaleAttributes":
-        new_id = other.id not in self.ids
-        rm_match = validate_resampling_method(
-            other.resampling_method, self.resampling_method
-        )
-        if new_id and rm_match:
-            self.layout.append(other)
-
-        return self
-
-    def __len__(self) -> int:
-        return len(self.layout)
-
-
-class CFMultiscaleDataset(CFDataset):
-    multiscales: CFMultiscaleAttributes
 
 
 if __name__ == "__main__":
