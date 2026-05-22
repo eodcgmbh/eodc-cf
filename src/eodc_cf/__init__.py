@@ -1,3 +1,5 @@
+"""Entry point for eodc-cf."""
+
 from eodc_cf._core import (
     CFCoordinate,
     CFDataset,
@@ -11,20 +13,17 @@ from eodc_cf._lib import (
     CFXCoordinate,
     CFYCoordinate,
 )
-from eodc_cf._version import __commit__, __version__
 
 __all__ = [
-    "__commit__",
-    "__version__",
-    "CFDataset",
-    "CFDataVariable",
-    "CFFlagVariable",
     "CFCoordinate",
-    "CFLonCoordinate",
+    "CFDataVariable",
+    "CFDataset",
+    "CFFlagVariable",
     "CFLatCoordinate",
+    "CFLonCoordinate",
+    "CFTimeCoordinate",
     "CFXCoordinate",
     "CFYCoordinate",
-    "CFTimeCoordinate",
 ]
 
 name = "eodc_cf"

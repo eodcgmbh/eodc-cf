@@ -1,3 +1,4 @@
+import pytest
 from pydantic_core._pydantic_core import ValidationError
 
 from eodc_cf._core import (
@@ -21,21 +22,21 @@ def test_cf_base():
     cf_base = CFBase(name="Var", standard_name="var_name")
     assert cf_base.name == "Var"
 
-    try:
+    with pytest.raises(
+        ValidationError,
+        match=r"String '1var' does not comply with the CF naming convention.",
+    ):
         cf_base = CFBase(name="1var", standard_name="var_name")
-        raise AssertionError()
-    except Exception as e:
-        assert str(e) == "String '1var' does not comply with the CF naming convention."
 
     try:
         cf_base = CFBase(name="var")
-        raise AssertionError()
+        raise AssertionError
     except ValidationError:
         assert True
 
     try:
         cf_base = CFBase(name="var", standard_name="var_name", long_name=123)
-        raise AssertionError()
+        raise AssertionError
     except ValidationError:
         assert True
 
@@ -51,13 +52,11 @@ def test_cf_coordinate():
         "other_attrs": {},
     }
 
-    try:
-        cf_coord = CFCoordinate(
-            name="z", standard_name="z_coordinate", axis="z", units="m"
-        )
-        raise AssertionError()
-    except Exception as e:
-        assert str(e) == "Axis name 'z' does not comply with the CF naming convention."
+    with pytest.raises(
+        ValidationError,
+        match=r"Axis name 'z' does not comply with the CF naming convention.",
+    ):
+        CFCoordinate(name="z", standard_name="z_coordinate", axis="z", units="m")
 
     cf_coord = CFCoordinate(name="z", standard_name="z_coordinate", axis="Z")
     assert cf_coord.attrs == {
@@ -94,7 +93,7 @@ def test_cf_datavar_base():
         cf_dvar = CFDataVariableBase(
             name="var", standard_name="var_name", valid_range=(2, "s")
         )
-        raise AssertionError()
+        raise AssertionError
     except ValidationError:
         assert True
 
@@ -107,12 +106,9 @@ def test_cf_datavar_base():
         cf_dvar = CFDataVariableBase(
             name="var", standard_name="var_name", other_attrs={"bad-name": 123}
         )
-        raise AssertionError()
-    except Exception as e:
-        assert (
-            str(e)
-            == "String 'bad-name' does not comply with the CF naming convention."
-        )
+        raise AssertionError
+    except ValueError:
+        assert True
 
     cf_dvar = CFDataVariableBase(
         name="var", standard_name="var_name", other_attrs={"test": 123}

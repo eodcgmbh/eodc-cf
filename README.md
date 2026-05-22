@@ -19,7 +19,7 @@ pip install git+https://github.com/eodcgmbh/eodc-cf.git
 
 ## Usage and examples
 
-_eodc-cf_ contains all user-facing classes at its root and a `utils` module, which collects some useful helper functions. 
+_eodc-cf_ contains all user-facing classes at its root and a `utils` module, which collects some useful helper functions.
 
 ### Coordinates
 In terms of multi-dimensional dataset hierarchy, the `CFCoordinate` class is at the lowest level. It defines some mandatory attributes like `name` and `standard_name`, and optional attributes like `long_name` or `units`. Certain attribute values are validated during class initialisation to ensure that they are CF compliant, e.g., `axis` always needs to have a single uppercase letter.
@@ -66,11 +66,11 @@ There are two types of data variables, `CFDataVariable` and `CFFlagVariable`. `C
 from eodc_cf import CFDataVariable
 
 cf_dvar = CFDataVariable(
-        name="dem", 
-        standard_name="digital_elevation_model", 
-        scale_factor=2.0, 
+        name="dem",
+        standard_name="digital_elevation_model",
+        scale_factor=2.0,
         add_offset=0,
-        fill_value=-9999, 
+        fill_value=-9999,
         units="m",
     )
 pprint(cf_dvar.attrs)
@@ -117,9 +117,9 @@ from eodc_cf import CFXCoordinate, CFYCoordinate, CFTimeCoordinate
 cf_xcoord = CFXCoordinate(name="x")
 cf_ycoord = CFYCoordinate(name="y")
 cf_dvar = CFDataVariable(
-        name="temp", 
-        standard_name="temperature", 
-        fill_value=-9999, 
+        name="temp",
+        standard_name="temperature",
+        fill_value=-9999,
         units="degrees_celsius",
         cf_coords=[cf_xcoord, cf_ycoord]
     )
@@ -200,6 +200,6 @@ cd eodc-cf
 pytest
 ```
 
-# Contributing 
+# Contributing
 
-For implementing new features, or fixing bugs, we recommend to open a new branch from `develop` (or fork the repo). Upon completion, open a PR from the feature branch to `develop`, which allows the maintainers/owners to review your changes. 
+For implementing new features, or fixing bugs, we recommend to open a new branch from `develop` (or fork the repo). Upon completion, open a PR from the feature branch to `develop`, which allows the maintainers/owners to review your changes.

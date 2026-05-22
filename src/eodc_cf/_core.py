@@ -1,52 +1,57 @@
+"""Core Pydantic models for CF convention variables and datasets."""
+
 import copy
 import re
-from typing import Annotated, Union
+from typing import Annotated, Any, Union
 
 from pydantic import AfterValidator, BaseModel, Field
 
 
-def validate_variable_name(input: str) -> str:
+def validate_variable_name(arg: str) -> str:
+    """Check if input does not start with a letter or contains invalid characters."""
     pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9]*$")
 
-    if not pattern.match(input):
-        raise Exception(
-            f"String '{input}' does not comply with the CF naming convention."
-        )
+    if not pattern.match(arg):
+        err_msg = f"String '{arg}' does not comply with the CF naming convention."
+        raise ValueError(err_msg)
 
-    return input
+    return arg
 
 
-def validate_long_name(input: str | None) -> str:
+def validate_long_name(arg: str | None) -> str:
+    """Check if input contains characters not permitted in a CF long name."""
     pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
 
-    if input and not pattern.match(input):
-        raise Exception(
-            f"Long name '{input}' does not comply with the CF naming convention."
-        )
+    if arg and not pattern.match(arg):
+        err_msg = f"Long name '{arg}' does not comply with the CF naming convention."
+        raise ValueError(err_msg)
 
-    return input
+    return arg
 
 
-def validate_axis_name(input: str | None) -> str:
+def validate_axis_name(arg: str | None) -> str:
+    """Check if input is not a single uppercase letter as required by CF conventions."""
     pattern = re.compile(r"^[A-Z]$")
 
-    if input and not pattern.match(input):
-        raise Exception(
-            f"Axis name '{input}' does not comply with the CF naming convention."
-        )
+    if arg and not pattern.match(arg):
+        err_msg = f"Axis name '{arg}' does not comply with the CF naming convention."
+        raise ValueError(err_msg)
 
-    return input
+    return arg
 
 
-def validate_attributes(input: dict | None) -> dict:
-    input = input or {}
-    for k in input.keys():
+def validate_attributes(arg: dict | None) -> dict:
+    """Check if any key in the dict is not a valid CF variable name."""
+    arg = arg or {}
+    for k in arg:
         validate_variable_name(k)
 
-    return input
+    return arg
 
 
 class CFBase(BaseModel):
+    """Shared base model providing name, standard_name, and optional long_name."""
+
     name: Annotated[str, AfterValidator(validate_variable_name)]
     standard_name: Annotated[str, AfterValidator(validate_variable_name)] = Field(
         ..., min_length=2, max_length=50
@@ -55,6 +60,8 @@ class CFBase(BaseModel):
 
 
 class CFCoordinate(CFBase):
+    """CF coordinate variable."""
+
     axis: Annotated[str, AfterValidator(validate_axis_name)] | None = None
     units: str | None = None
     other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
@@ -69,6 +76,8 @@ class CFCoordinate(CFBase):
 
 
 class CFDataVariableBase(CFBase):
+    """CF data variables model; supports attaching coordinates via + operator."""
+
     fill_value: int | float | None = 0
     valid_range: tuple[int | float, int | float] | None = None
     grid_mapping: Annotated[str, AfterValidator(validate_variable_name)] = None
@@ -76,7 +85,10 @@ class CFDataVariableBase(CFBase):
 
     _coordinates = {}
 
-    def __init__(self, cf_coords: list[CFCoordinate] | None = None, **kwargs):
+    def __init__(
+        self, cf_coords: list[CFCoordinate] | None = None, **kwargs: Any
+    ) -> None:
+        """Initialize the variable and optionally register a list of CF coordinates."""
         super().__init__(**kwargs)
         if cf_coords:
             for cf_coord in cf_coords:
@@ -84,6 +96,7 @@ class CFDataVariableBase(CFBase):
                     self._coordinates[cf_coord.name] = cf_coord
 
     def __add__(self, other: CFCoordinate) -> "CFDataVariableBase":
+        """Attach a CFCoordinate to this variable and return self."""
         if isinstance(other, CFCoordinate):
             self._coordinates.update({other.name: other})
 
@@ -110,12 +123,16 @@ class CFDataVariableBase(CFBase):
 
 
 class CFDataVariable(CFDataVariableBase):
+    """CF data variable with scale_factor, add_offset, and units."""
+
     scale_factor: int | float | None = 1.0
     add_offset: int | float | None = 0
     units: str | None = None
 
 
 class CFFlagVariable(CFDataVariableBase):
+    """CF flag variable encoding discrete states."""
+
     fill_value: int | None = 255
     flag_values: list
     flag_masks: list | None = None
@@ -129,6 +146,8 @@ class CFFlagVariable(CFDataVariableBase):
 
 
 class CFDataset(BaseModel):
+    """CF dataset holding global attributes and data variables."""
+
     title: str
     source: str
     institution: str | None = "EODC"
@@ -144,8 +163,11 @@ class CFDataset(BaseModel):
         return self._variables
 
     def __init__(
-        self, cf_vars: list[CFDataVariable | CFFlagVariable] | None = None, **kwargs
-    ):
+        self,
+        cf_vars: list[CFDataVariable | CFFlagVariable] | None = None,
+        **kwargs: Any,
+    ) -> None:
+        """Initialize the dataset and register a list of CF data variables."""
         super().__init__(**kwargs)
         if cf_vars:
             for cf_var in cf_vars:
@@ -155,6 +177,7 @@ class CFDataset(BaseModel):
     def __add__(
         self, other: Union["CFDataset", CFDataVariable, CFFlagVariable]
     ) -> "CFDataset":
+        """Merge another CFDataset or attach a single data variable."""
         if isinstance(other, CFDataset):
             self._variables.update(other.variables)
         elif isinstance(other, CFDataVariable | CFFlagVariable):

@@ -1,8 +1,14 @@
+"""Pre-configured CFCoordinate subclasses."""
+
+from typing import Any
+
 from eodc_cf._core import CFCoordinate
 
 
 class CFLonCoordinate(CFCoordinate):
-    def __init__(self, **kwargs):
+    """Geographic longitude coordinate (degrees_east, axis X)."""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(
             standard_name="longitude",
             long_name="longitude",
@@ -13,7 +19,9 @@ class CFLonCoordinate(CFCoordinate):
 
 
 class CFLatCoordinate(CFCoordinate):
-    def __init__(self, **kwargs):
+    """Geographic latitude coordinate (degrees_north, axis Y)."""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(
             standard_name="latitude",
             long_name="latitude",
@@ -24,7 +32,9 @@ class CFLatCoordinate(CFCoordinate):
 
 
 class CFXCoordinate(CFCoordinate):
-    def __init__(self, **kwargs):
+    """Projected x coordinate (meters, axis X)."""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(
             standard_name="projection_x_coordinate",
             long_name="x coordinate of projection",
@@ -35,7 +45,9 @@ class CFXCoordinate(CFCoordinate):
 
 
 class CFYCoordinate(CFCoordinate):
-    def __init__(self, **kwargs):
+    """Projected y coordinate (meters, axis Y)."""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(
             standard_name="projection_y_coordinate",
             long_name="y coordinate of projection",
@@ -46,7 +58,9 @@ class CFYCoordinate(CFCoordinate):
 
 
 class CFTimeCoordinate(CFCoordinate):
-    def __init__(self, **kwargs):
+    """Temporal coordinate (axis T); units must be supplied by the caller."""
+
+    def __init__(self, **kwargs: Any) -> None:
         super().__init__(standard_name="time", axis="T", **kwargs)
 
 
