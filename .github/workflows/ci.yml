@@ -30,7 +30,7 @@ jobs:
         run: uv python install
 
       - name: Install the Project
-        run: uv sync --all-extras --dev
+        run: uv sync --all-extras --all-groups
 
       - name: Run Tests
         run: uv run pytest tests --verbose --color=yes --cov=eodc-cf --cov-report term-missing
