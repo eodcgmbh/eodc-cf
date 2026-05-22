@@ -17,6 +17,7 @@ __pycache__/*
 # Project files
 .ropeproject
 .project
+.scripts
 .pydevproject
 .settings
 .idea
@@ -44,11 +45,19 @@ sdist/*
 docs/api/*
 docs/_rst/*
 docs/_build/*
+docs/apidocs/*
 cover/*
 MANIFEST
 
 # Per-project virtualenvs
+# Per-project virtualenvs
 .venv*/
 venv
+uv.lock
+*ipynb
 
-*.ipynb
+.scripts
+.env
+
+# MyST build outputs
+_build
