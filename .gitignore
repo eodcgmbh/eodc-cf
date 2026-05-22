@@ -54,7 +54,7 @@ MANIFEST
 .venv*/
 venv
 uv.lock
-*ipynb
+*.ipynb
 
 .scripts
 .env
