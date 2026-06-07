@@ -26,7 +26,12 @@ def test_assign_cf_md():
 
     ds = assign_cf_metadata(ds, cf_ds)
 
-    assert ds.attrs == {"title": "test_ds", "source": "tests", "institution": "EODC"}
+    assert ds.attrs == {
+        "title": "test_ds",
+        "source": "tests",
+        "institution": "EODC",
+        "conventions": "CF-1.11",
+    }
     assert ds["var"].attrs == {
         "standard_name": "var_name",
         "_FillValue": 0,
