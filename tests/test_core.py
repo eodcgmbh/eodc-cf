@@ -209,6 +209,17 @@ def test_cf_dataset():
     }
 
 
+def test_cf_dataset_references():
+    cf_ds = CFDataset(title="dataset", source="source", references=["a", "reference"])
+    assert cf_ds.attrs == {
+        "title": "dataset",
+        "source": "source",
+        "institution": "eodc",
+        "conventions": "CF-1.11",
+        "references": "a;reference",
+    }
+
+
 def test_add_coords():
     cf_coord = CFCoordinate(name="x", standard_name="x_coordinate")
     cf_dvar = CFDataVariableBase(name="var", standard_name="var_name", cf_coords=[1])

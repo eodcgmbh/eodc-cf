@@ -205,6 +205,8 @@ class CFDataset(BaseModel):
         attrs = super().model_dump(exclude=["other_attrs"], exclude_none=True)
         metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)
+        if ("references" in metadata) and isinstance(metadata["references"], list):
+            metadata["references"] = ";".join(metadata["references"])
 
         return metadata
 
