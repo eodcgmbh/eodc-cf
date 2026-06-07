@@ -164,6 +164,7 @@ class CFDataset(BaseModel):
     institution: str | None = "EODC"
     history: str | None = None
     references: list[str] | None = None
+    conventions: str = "CF-1.11"
     comment: str | None = None
     other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
