@@ -4,7 +4,7 @@ requires = [ "uv-build>=0.11.2,<0.12" ]
 
 [project]
 name = "eodc-cf"
-version = "0.2.0"
+version = "0.2.1"
 description = "Generic and light-weight package to assist CF-compliant dataset creation"
 readme = "README.md"
 authors = [ { name = "eodc", email = "claudio.schein-navacchi@eodc.eu" } ]
