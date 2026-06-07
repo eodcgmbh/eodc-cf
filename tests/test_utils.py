@@ -29,7 +29,7 @@ def test_assign_cf_md():
     assert ds.attrs == {
         "title": "test_ds",
         "source": "tests",
-        "institution": "EODC",
+        "institution": "eodc",
         "conventions": "CF-1.11",
     }
     assert ds["var"].attrs == {

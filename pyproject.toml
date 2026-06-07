@@ -7,7 +7,7 @@ name = "eodc-cf"
 version = "0.2.0"
 description = "Generic and light-weight package to assist CF-compliant dataset creation"
 readme = "README.md"
-authors = [ { name = "EODC", email = "claudio.schein-navacchi@eodc.eu" } ]
+authors = [ { name = "eodc", email = "claudio.schein-navacchi@eodc.eu" } ]
 requires-python = ">=3.10"
 classifiers = [
   "Intended Audience :: Science/Research",

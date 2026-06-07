@@ -194,7 +194,7 @@ def test_cf_dataset():
     assert cf_ds.model_dump() == {
         "title": "dataset",
         "source": "source",
-        "institution": "EODC",
+        "institution": "eodc",
         "history": None,
         "references": None,
         "conventions": "CF-1.11",
@@ -204,7 +204,7 @@ def test_cf_dataset():
     assert cf_ds.attrs == {
         "title": "dataset",
         "source": "source",
-        "institution": "EODC",
+        "institution": "eodc",
         "conventions": "CF-1.11",
     }
 

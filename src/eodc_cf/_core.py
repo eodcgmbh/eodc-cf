@@ -161,7 +161,7 @@ class CFDataset(BaseModel):
 
     title: str
     source: str
-    institution: str | None = "EODC"
+    institution: str | None = "eodc"
     history: str | None = None
     references: list[str] | None = None
     conventions: str = "CF-1.11"
