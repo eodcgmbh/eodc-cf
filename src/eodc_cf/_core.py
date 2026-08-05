@@ -64,9 +64,7 @@ class CFBase(BaseModel):
     """Shared base model providing name, standard_name, and optional long_name."""
 
     name: Annotated[str, AfterValidator(validate_variable_name)]
-    standard_name: Annotated[str, AfterValidator(validate_variable_name)] = Field(
-        ..., min_length=2, max_length=50
-    )
+    standard_name: Annotated[str, AfterValidator(validate_variable_name)]
     long_name: Annotated[str, AfterValidator(validate_long_name)] | None = None
 
 
@@ -164,7 +162,7 @@ class CFDataset(BaseModel):
     institution: str | None = "eodc"
     history: str | None = None
     references: list[str] | None = None
-    conventions: str = "CF-1.11"
+    Conventions: str = "CF-1.11"
     comment: str | None = None
     other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 

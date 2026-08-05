@@ -197,7 +197,7 @@ def test_cf_dataset():
         "institution": "eodc",
         "history": None,
         "references": None,
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
         "comment": None,
         "other_attrs": {},
     }
@@ -205,7 +205,7 @@ def test_cf_dataset():
         "title": "dataset",
         "source": "source",
         "institution": "eodc",
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
     }
 
 
@@ -215,7 +215,7 @@ def test_cf_dataset_references():
         "title": "dataset",
         "source": "source",
         "institution": "eodc",
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
         "references": "a;reference",
     }
 

@@ -66,7 +66,7 @@ table_format = "long"
 collapse_tables = [ "project.authors" ]
 
 [tool.pytest.ini_options]
-addopts = "--cov=cube_factory --cov-report term-missing -rsx --verbose --color=yes"
+addopts = "--cov=eodc_cf --cov-report term-missing -rsx --verbose --color=yes"
 markers = [ "warp_installed" ]
 
 [tool.coverage.run]
