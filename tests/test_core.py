@@ -40,6 +40,12 @@ def test_cf_base():
     except ValidationError:
         assert True
 
+    with pytest.raises(
+        ValidationError,
+        match=r"Long name 'bad-name' does not comply with the CF naming convention.",
+    ):
+        cf_base = CFBase(name="var", standard_name="var_name", long_name="bad-name")
+
 
 def test_cf_coordinate():
     cf_coord = CFCoordinate(name="z", standard_name="z_coordinate", axis="Z", units="m")
