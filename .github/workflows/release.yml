@@ -37,6 +37,3 @@ jobs:
             --notes-file release-notes.md \
             --fail-on-no-commits \
             --draft
-
-      - name: Publish package distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
