@@ -162,7 +162,7 @@ pprint(cf_ds.attrs)
 ```
 
     1
-    {'institution': 'eodc', 'source': 'my dataset source', 'title': 'my dataset'}
+    {'institution': 'eodc', 'source': 'my dataset source', 'title': 'my dataset', 'Conventions': 'CF-1.11'}
 
 
 Also here we can now append CF data variables as we like:
