@@ -1,6 +1,6 @@
 import pytest
 
-from eodc_cf._lib import (
+from cf_cm_tree._lib import (
     CFLatCoordinate,
     CFLonCoordinate,
     CFTimeCoordinate,

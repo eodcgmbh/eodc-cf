@@ -1,9 +1,9 @@
 import numpy as np
 import xarray as xr
 
-from eodc_cf._core import CFDataset, CFDataVariable
-from eodc_cf._lib import CFTimeCoordinate, CFXCoordinate, CFYCoordinate
-from eodc_cf.utils import assign_cf_metadata
+from cf_cm_tree._core import CFDataset, CFDataVariable
+from cf_cm_tree._lib import CFTimeCoordinate, CFXCoordinate, CFYCoordinate
+from cf_cm_tree.utils import assign_cf_metadata
 
 
 def test_assign_cf_md():
