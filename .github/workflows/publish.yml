@@ -25,9 +25,3 @@ jobs:
 
       - name: Upload to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        #with:
-        #  skip_existing: true
-        #  verbose: true
-        #  verify_metadata: true
-          #user: __token__
-          #password: ${{ secrets.PYPI_API_TOKEN }} # this needs to be uploaded to github actions secrets
