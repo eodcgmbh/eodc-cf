@@ -4,11 +4,15 @@ import copy
 import re
 from typing import Annotated, Any, Union
 
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import AfterValidator, BaseModel
 
 
 def validate_variable_name(arg: str) -> str:
-    """Check if input does not start with a letter or contains invalid characters."""
+    """Validate a CF variable/standard name.
+
+    Returns arg unchanged if it starts with a letter and holds only letters,
+    digits, and underscores; raises ValueError otherwise.
+    """
     pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9]*$")
 
     if not pattern.match(arg):
@@ -19,7 +23,11 @@ def validate_variable_name(arg: str) -> str:
 
 
 def validate_attribute_name(arg: str) -> str:
-    """Check if attribute does not contain invalid characters."""
+    """Validate a CF attribute name.
+
+    Returns arg unchanged if it starts with a letter and holds only letters,
+    digits, underscores, and colons; raises ValueError otherwise.
+    """
     pattern = re.compile(r"^[a-zA-Z][a-zA-Z_0-9:]*$")
 
     if not pattern.match(arg):
@@ -30,7 +38,11 @@ def validate_attribute_name(arg: str) -> str:
 
 
 def validate_long_name(arg: str | None) -> str:
-    """Check if input contains characters not permitted in a CF long name."""
+    """Validate a CF long name.
+
+    Returns arg unchanged if it is None or holds only letters, digits,
+    whitespace, and `(),`; raises ValueError otherwise.
+    """
     pattern = re.compile(r"^[a-zA-Z_0-9][a-zA-Z_0-9\s(),]+$")
 
     if arg and not pattern.match(arg):
@@ -41,7 +53,11 @@ def validate_long_name(arg: str | None) -> str:
 
 
 def validate_axis_name(arg: str | None) -> str:
-    """Check if input is not a single uppercase letter as required by CF conventions."""
+    """Validate a CF axis name.
+
+    Returns arg unchanged if it is None or a single uppercase letter;
+    raises ValueError otherwise.
+    """
     pattern = re.compile(r"^[A-Z]$")
 
     if arg and not pattern.match(arg):
@@ -52,7 +68,11 @@ def validate_axis_name(arg: str | None) -> str:
 
 
 def validate_attributes(arg: dict | None) -> dict:
-    """Check if any key in the dict is not a valid CF attribute name."""
+    """Validate a dict of CF attributes.
+
+    Returns arg (or an empty dict if None) after validating every key as a
+    CF attribute name.
+    """
     arg = arg or {}
     for k in arg:
         validate_attribute_name(k)
@@ -64,9 +84,7 @@ class CFBase(BaseModel):
     """Shared base model providing name, standard_name, and optional long_name."""
 
     name: Annotated[str, AfterValidator(validate_variable_name)]
-    standard_name: Annotated[str, AfterValidator(validate_variable_name)] = Field(
-        ..., min_length=2, max_length=50
-    )
+    standard_name: Annotated[str, AfterValidator(validate_variable_name)]
     long_name: Annotated[str, AfterValidator(validate_long_name)] | None = None
 
 
@@ -79,6 +97,10 @@ class CFCoordinate(CFBase):
 
     @property
     def attrs(self) -> dict:
+        """Return CF-compliant metadata as a dict.
+
+        Merges other_attrs with the model fields (name excluded).
+        """
         attrs = super().model_dump(exclude=["name", "other_attrs"], exclude_none=True)
         metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)
@@ -107,17 +129,25 @@ class CFDataVariableBase(CFBase):
                     self._coordinates[cf_coord.name] = cf_coord
 
     def __add__(self, other: CFCoordinate) -> "CFDataVariableBase":
-        """Attach a CFCoordinate to this variable and return self."""
+        """Attach a CFCoordinate to this variable and return self.
+
+        Non-CFCoordinate values are ignored, which allows chaining `+`.
+        """
         if isinstance(other, CFCoordinate):
             self._coordinates.update({other.name: other})
 
         return self
 
     def __len__(self) -> int:
+        """Return the number of attached coordinates."""
         return len(self._coordinates)
 
     @property
     def attrs(self) -> dict:
+        """Return CF-compliant metadata as a dict.
+
+        Renames fill_value to _FillValue and merges with other_attrs.
+        """
         attrs = super().model_dump(
             exclude=["name", "fill_value", "other_attrs"], exclude_none=True
         )
@@ -130,6 +160,7 @@ class CFDataVariableBase(CFBase):
 
     @property
     def coordinates(self) -> dict[str, CFCoordinate]:
+        """Return the attached CFCoordinate instances, keyed by their name."""
         return self._coordinates
 
 
@@ -142,7 +173,7 @@ class CFDataVariable(CFDataVariableBase):
 
 
 class CFFlagVariable(CFDataVariableBase):
-    """CF flag variable encoding discrete states."""
+    """CF flag variable encoding discrete boolean or bitwise states."""
 
     fill_value: int | None = 255
     flag_values: list
@@ -151,6 +182,10 @@ class CFFlagVariable(CFDataVariableBase):
 
     @property
     def attrs(self) -> dict:
+        """Return CF-compliant metadata as a dict.
+
+        Joins flag_meanings into a single space-separated string.
+        """
         metadata = super().attrs
         metadata["flag_meanings"] = " ".join(metadata["flag_meanings"])
         return metadata
@@ -164,7 +199,7 @@ class CFDataset(BaseModel):
     institution: str | None = "eodc"
     history: str | None = None
     references: list[str] | None = None
-    conventions: str = "CF-1.11"
+    Conventions: str = "CF-1.11"
     comment: str | None = None
     other_attrs: Annotated[dict, AfterValidator(validate_attributes)] | None = {}
 
@@ -172,6 +207,7 @@ class CFDataset(BaseModel):
 
     @property
     def variables(self) -> dict[str, CFDataVariable | CFFlagVariable]:
+        """Return the attached CF data/flag variables, keyed by their name."""
         return self._variables
 
     def __init__(
@@ -189,7 +225,10 @@ class CFDataset(BaseModel):
     def __add__(
         self, other: Union["CFDataset", CFDataVariable, CFFlagVariable]
     ) -> "CFDataset":
-        """Merge another CFDataset or attach a single data variable."""
+        """Merge another CFDataset, or attach a single data/flag variable.
+
+        Returns self; other types are ignored.
+        """
         if isinstance(other, CFDataset):
             self._variables.update(other.variables)
         elif isinstance(other, CFDataVariable | CFFlagVariable):
@@ -198,10 +237,15 @@ class CFDataset(BaseModel):
         return self
 
     def __len__(self) -> int:
+        """Return the number of attached variables."""
         return len(self._variables)
 
     @property
     def attrs(self) -> dict:
+        """Return CF-compliant global attributes as a dict.
+
+        Joins a references list into a single semicolon-separated string.
+        """
         attrs = super().model_dump(exclude=["other_attrs"], exclude_none=True)
         metadata = copy.deepcopy(self.other_attrs)
         metadata.update(attrs)

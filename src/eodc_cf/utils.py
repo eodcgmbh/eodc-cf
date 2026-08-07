@@ -6,7 +6,11 @@ from eodc_cf._core import CFDataset
 
 
 def assign_cf_metadata(ds: xr.Dataset, cf_ds: CFDataset) -> xr.Dataset:
-    """Apply all CF attributes from cf_ds to ds."""
+    """Apply cf_ds's global, variable, and coordinate attributes onto ds in place.
+
+    Variables and coordinates are matched by name; raises KeyError on a
+    name mismatch.
+    """
     ds.attrs.update(cf_ds.attrs)
     for var_name, cf_var in cf_ds.variables.items():
         ds[var_name].attrs.update(cf_var.attrs)

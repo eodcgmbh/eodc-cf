@@ -40,6 +40,12 @@ def test_cf_base():
     except ValidationError:
         assert True
 
+    with pytest.raises(
+        ValidationError,
+        match=r"Long name 'bad-name' does not comply with the CF naming convention.",
+    ):
+        cf_base = CFBase(name="var", standard_name="var_name", long_name="bad-name")
+
 
 def test_cf_coordinate():
     cf_coord = CFCoordinate(name="z", standard_name="z_coordinate", axis="Z", units="m")
@@ -197,7 +203,7 @@ def test_cf_dataset():
         "institution": "eodc",
         "history": None,
         "references": None,
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
         "comment": None,
         "other_attrs": {},
     }
@@ -205,7 +211,7 @@ def test_cf_dataset():
         "title": "dataset",
         "source": "source",
         "institution": "eodc",
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
     }
 
 
@@ -215,7 +221,7 @@ def test_cf_dataset_references():
         "title": "dataset",
         "source": "source",
         "institution": "eodc",
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
         "references": "a;reference",
     }
 

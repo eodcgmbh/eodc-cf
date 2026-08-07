@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
+## [v0.2.2](https://github.com/eodcgmbh/eodc-cf/releases/tag/v0.2.2) - 2026-08-06
+
+<small>[Compare with 0.2.1](https://github.com/eodcgmbh/eodc-cf/compare/0.2.1...v0.2.2)</small>
+
+### Summary
+
+- changed "conversions" to "Conversions" attribute
+- removed standard_name length restriction
+- updated tests, README and docstrings
+
 ## [v0.2.1](https://github.com/eodcgmbh/eodc-cf/releases/tag/v0.2.1) - 2026-06-07
 
 <small>[Compare with 0.2.0](https://github.com/eodcgmbh/eodc-cf/compare/0.2.0...v0.2.1)</small>

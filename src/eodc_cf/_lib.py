@@ -1,4 +1,10 @@
-"""Pre-configured CFCoordinate subclasses."""
+"""Pre-configured CFCoordinate subclasses.
+
+Each subclass hardcodes standard_name and axis (and, where fixed by
+convention, long_name/units) as keyword arguments to CFCoordinate.__init__,
+so passing any of those same names via **kwargs raises TypeError; other
+CFCoordinate fields (e.g. name, other_attrs) can be passed normally.
+"""
 
 from typing import Any
 

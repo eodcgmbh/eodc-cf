@@ -128,8 +128,8 @@ pprint(cf_dvar.coordinates)
 ```
 
     2
-    {'x': CFXCoordinate(name='x', standard_name='projection_x_coordinate', long_name='x coordinate of projection', axis='X', units='meters'),
-     'y': CFYCoordinate(name='y', standard_name='projection_y_coordinate', long_name='y coordinate of projection', axis='Y', units='meters')}
+    {'x': CFXCoordinate(name='x', standard_name='projection_x_coordinate', long_name='x coordinate of projection', axis='X', units='meters', other_attrs={}),
+     'y': CFYCoordinate(name='y', standard_name='projection_y_coordinate', long_name='y coordinate of projection', axis='Y', units='meters', other_attrs={})}
 
 
 
@@ -141,9 +141,9 @@ pprint(cf_dvar.coordinates)
 ```
 
     3
-    {'t': CFTimeCoordinate(name='t', standard_name='time', long_name=None, axis='T', units='days since 1990-1-1 0:0:0'),
-     'x': CFXCoordinate(name='x', standard_name='projection_x_coordinate', long_name='x coordinate of projection', axis='X', units='meters'),
-     'y': CFYCoordinate(name='y', standard_name='projection_y_coordinate', long_name='y coordinate of projection', axis='Y', units='meters')}
+    {'t': CFTimeCoordinate(name='t', standard_name='time', long_name=None, axis='T', units='days since 1990-1-1 0:0:0', other_attrs={}),
+     'x': CFXCoordinate(name='x', standard_name='projection_x_coordinate', long_name='x coordinate of projection', axis='X', units='meters', other_attrs={}),
+     'y': CFYCoordinate(name='y', standard_name='projection_y_coordinate', long_name='y coordinate of projection', axis='Y', units='meters', other_attrs={})}
 
 
 **Attention**: be aware that the `+` operator overwrites the initial instance!
@@ -162,7 +162,7 @@ pprint(cf_ds.attrs)
 ```
 
     1
-    {'institution': 'eodc', 'source': 'my dataset source', 'title': 'my dataset'}
+    {'institution': 'eodc', 'source': 'my dataset source', 'title': 'my dataset', 'Conventions': 'CF-1.11'}
 
 
 Also here we can now append CF data variables as we like:
@@ -192,6 +192,42 @@ pprint(cf_ds1.variables)
     {'qflag': CFFlagVariable(name='qflag', standard_name='quality_flag', long_name=None, fill_value=255, valid_range=None, grid_mapping=None, other_attrs={}, flag_values=[1, 2, 4], flag_masks=None, flag_meanings=['processing_successfull', 'retrieval_successful', 'quality_good']),
      'temp': CFDataVariable(name='temp', standard_name='temperature', long_name=None, fill_value=-9999, valid_range=None, grid_mapping=None, other_attrs={}, scale_factor=1.0, add_offset=0, units='degrees_celsius')}
 
+
+### Applying metadata to an xarray dataset
+
+The `utils` module provides `assign_cf_metadata`, which writes the CF attributes of a `CFDataset` (and its variables and coordinates) onto a matching `xarray.Dataset` in place.
+
+
+```python
+import numpy as np
+import xarray as xr
+from eodc_cf.utils import assign_cf_metadata
+
+da = xr.DataArray(
+    np.zeros((2, 2, 2)),
+    coords={"t": range(2), "y": range(2), "x": range(2)},
+    dims=["t", "y", "x"],
+)
+ds = xr.Dataset({"temp": da})
+
+new_cf_ds = CFDataset(title="my dataset", source="my dataset source", cf_vars=[cf_dvar])
+ds = assign_cf_metadata(ds, new_cf_ds)
+pprint(dict(ds["temp"].attrs))
+pprint(dict(ds["x"].attrs))
+```
+
+    {'_FillValue': -9999,
+     'add_offset': 0,
+     'scale_factor': 1.0,
+     'standard_name': 'temperature',
+     'units': 'degrees_celsius'}
+    {'axis': 'X',
+     'long_name': 'x coordinate of projection',
+     'standard_name': 'projection_x_coordinate',
+     'units': 'meters'}
+
+
+**Note**: dataset, variable, and coordinate names in `ds` must match the `name` given to the corresponding `CFDataset`/`CFDataVariable`/`CFCoordinate` instances, otherwise a `KeyError` is raised.
 
 # Testing
 

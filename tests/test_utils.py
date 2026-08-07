@@ -30,7 +30,7 @@ def test_assign_cf_md():
         "title": "test_ds",
         "source": "tests",
         "institution": "eodc",
-        "conventions": "CF-1.11",
+        "Conventions": "CF-1.11",
     }
     assert ds["var"].attrs == {
         "standard_name": "var_name",
