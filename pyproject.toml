@@ -25,7 +25,7 @@ classifiers = [
 ]
 dependencies = [ "pydantic", "xarray" ]
 [project.urls]
-Repository = "https://github.com/eodcgmbh/eodc-cf"
+Repository = "https://github.com/eodcgmbh/cf-cm-tree"
 
 [dependency-groups]
 test = [ "pytest", "pytest-cov" ]

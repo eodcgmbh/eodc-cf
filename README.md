@@ -14,7 +14,7 @@ Generic and light-weight package to assist CF-compliant dataset creation.
 # Installation
 
 ```bash
-pip install git+https://github.com/eodcgmbh/eodc-cf.git
+pip install cf-cm-tree
 ```
 
 ## Usage and examples
@@ -232,7 +232,7 @@ pprint(dict(ds["x"].attrs))
 # Testing
 
 ```bash
-cd eodc-cf
+cd cf-cm-tree
 pytest
 ```
 
