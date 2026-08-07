@@ -1,12 +1,12 @@
-"""Entry point for eodc-cf."""
+"""Entry point for cf-cm-tree."""
 
-from eodc_cf._core import (
+from cf_cm_tree._core import (
     CFCoordinate,
     CFDataset,
     CFDataVariable,
     CFFlagVariable,
 )
-from eodc_cf._lib import (
+from cf_cm_tree._lib import (
     CFLatCoordinate,
     CFLonCoordinate,
     CFTimeCoordinate,
@@ -26,4 +26,4 @@ __all__ = [
     "CFYCoordinate",
 ]
 
-name = "eodc_cf"
+name = "cf_cm_tree"

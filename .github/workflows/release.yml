@@ -33,7 +33,7 @@ jobs:
         run: |
           gh release create ${{ github.ref_name }} \
             --repo ${{ github.repository }} \
-            --title "eodc-cf - ${{ github.ref_name }}" \
+            --title "cf-cm-tree - ${{ github.ref_name }}" \
             --notes-file release-notes.md \
             --fail-on-no-commits \
             --draft

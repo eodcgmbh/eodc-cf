@@ -2,7 +2,7 @@
 
 import xarray as xr
 
-from eodc_cf._core import CFDataset
+from cf_cm_tree._core import CFDataset
 
 
 def assign_cf_metadata(ds: xr.Dataset, cf_ds: CFDataset) -> xr.Dataset:

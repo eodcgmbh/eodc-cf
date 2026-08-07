@@ -1,7 +1,7 @@
 import pytest
 from pydantic_core._pydantic_core import ValidationError
 
-from eodc_cf._core import (
+from cf_cm_tree._core import (
     CFBase,
     CFCoordinate,
     CFDataset,

@@ -1,8 +1,8 @@
-# eodc-cf
+# cf-cm-tree
 
 Generic and light-weight package to assist CF-compliant dataset creation.
 
-> **GeoZarr note.** `eodc-cf` is a **CF-conventions** helper. It does *not*
+> **GeoZarr note.** `cf-cm-tree` is a **CF-conventions** helper. It does *not*
 > implement the [GeoZarr](https://geozarr.org) conventions (`geo-proj`,
 > `spatial`, `multiscales`). For spec-compliant GeoZarr metadata use
 > [`zarr-cm`](https://github.com/zarr-conventions/zarr-cm) (primitives,
@@ -14,12 +14,12 @@ Generic and light-weight package to assist CF-compliant dataset creation.
 # Installation
 
 ```bash
-pip install git+https://github.com/eodcgmbh/eodc-cf.git
+pip install cf-cm-tree
 ```
 
 ## Usage and examples
 
-_eodc-cf_ contains all user-facing classes at its root and a `utils` module, which collects some useful helper functions.
+_cf-cm-tree_ contains all user-facing classes at its root and a `utils` module, which collects some useful helper functions.
 
 ### Coordinates
 In terms of multi-dimensional dataset hierarchy, the `CFCoordinate` class is at the lowest level. It defines some mandatory attributes like `name` and `standard_name`, and optional attributes like `long_name` or `units`. Certain attribute values are validated during class initialisation to ensure that they are CF compliant, e.g., `axis` always needs to have a single uppercase letter.
@@ -27,7 +27,7 @@ In terms of multi-dimensional dataset hierarchy, the `CFCoordinate` class is at 
 
 ```python
 from pprint import pprint
-from eodc_cf import CFCoordinate
+from cf_cm_tree import CFCoordinate
 
 cf_coord = CFCoordinate(name="z", standard_name="z_coordinate", axis="Z", units="m")
 ```
@@ -46,7 +46,7 @@ There are already some pre-defined coordinate classes available, e.g., `CFXCoord
 
 
 ```python
-from eodc_cf import CFXCoordinate
+from cf_cm_tree import CFXCoordinate
 
 cf_xcoord = CFXCoordinate(name="x")
 pprint(cf_xcoord.attrs)
@@ -63,7 +63,7 @@ There are two types of data variables, `CFDataVariable` and `CFFlagVariable`. `C
 
 
 ```python
-from eodc_cf import CFDataVariable
+from cf_cm_tree import CFDataVariable
 
 cf_dvar = CFDataVariable(
         name="dem",
@@ -87,7 +87,7 @@ and here with `CFFlagVariable`:
 
 
 ```python
-from eodc_cf import CFFlagVariable
+from cf_cm_tree import CFFlagVariable
 
 cf_fvar = CFFlagVariable(
         name="qflag",
@@ -112,7 +112,7 @@ Each data variable can hold a set of coordinates with unique names. Coordinates 
 
 
 ```python
-from eodc_cf import CFXCoordinate, CFYCoordinate, CFTimeCoordinate
+from cf_cm_tree import CFXCoordinate, CFYCoordinate, CFTimeCoordinate
 
 cf_xcoord = CFXCoordinate(name="x")
 cf_ycoord = CFYCoordinate(name="y")
@@ -154,7 +154,7 @@ The `CFDataset` is at the highest level of a multi-dimensional dataset hierarchy
 
 
 ```python
-from eodc_cf import CFDataset
+from cf_cm_tree import CFDataset
 
 cf_ds = CFDataset(title="my dataset", source="my dataset source", cf_vars=[cf_dvar])
 print(len(cf_ds))
@@ -201,7 +201,7 @@ The `utils` module provides `assign_cf_metadata`, which writes the CF attributes
 ```python
 import numpy as np
 import xarray as xr
-from eodc_cf.utils import assign_cf_metadata
+from cf_cm_tree.utils import assign_cf_metadata
 
 da = xr.DataArray(
     np.zeros((2, 2, 2)),
@@ -232,7 +232,7 @@ pprint(dict(ds["x"].attrs))
 # Testing
 
 ```bash
-cd eodc-cf
+cd cf-cm-tree
 pytest
 ```
 

@@ -8,7 +8,7 @@ CFCoordinate fields (e.g. name, other_attrs) can be passed normally.
 
 from typing import Any
 
-from eodc_cf._core import CFCoordinate
+from cf_cm_tree._core import CFCoordinate
 
 
 class CFLonCoordinate(CFCoordinate):

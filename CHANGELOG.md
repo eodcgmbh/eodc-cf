@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 <!-- insertion marker -->
-## [v0.2.2](https://github.com/eodcgmbh/eodc-cf/releases/tag/v0.2.2) - 2026-08-06
+## [v1.0.0](https://github.com/eodcgmbh/eodc-cf/releases/tag/v1.0.0) - 2026-08-07
 
-<small>[Compare with 0.2.1](https://github.com/eodcgmbh/eodc-cf/compare/0.2.1...v0.2.2)</small>
+<small>[Compare with 0.2.1](https://github.com/eodcgmbh/eodc-cf/compare/0.2.1...v1.0.0)</small>
 
 ### Summary
 
+- complete rename of the package from "eodc-cf" to "cf-cm-tree"
 - changed "conversions" to "Conversions" attribute
 - removed standard_name length restriction
 - updated tests, README and docstrings
